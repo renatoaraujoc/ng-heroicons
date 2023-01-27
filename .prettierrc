@@ -1,3 +1,16 @@
 {
-  "singleQuote": true
+    "overrides": [
+        {
+            "files": ["*.ts"],
+            "options": {
+                "parser": "typescript"
+            }
+        }
+    ],
+    "printWidth": 80,
+    "tabWidth": 4,
+    "useTabs": false,
+    "singleQuote": true,
+    "trailingComma": "none",
+    "importOrderParserPlugins": ["typescript", "decorators-legacy"]
 }

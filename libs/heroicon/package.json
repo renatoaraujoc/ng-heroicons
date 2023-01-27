@@ -1,0 +1,36 @@
+{
+    "name": "ng-heroicon",
+    "author": "Renato Carneiro",
+    "version": "3.0.0",
+    "description": "Component to display icons from heroicons.com for Angular14+, compatible with TailwindCSS",
+    "keywords": [
+        "tailwind",
+        "heroicon",
+        "angular",
+        "ng",
+        "icons"
+    ],
+    "homepage": "https://github.com/renatoaraujoc/heroicons/tree/master/angular/heroicons#readme",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/renatoaraujoc/heroicons.git"
+    },
+    "peerDependencies": {
+        "@angular/common": "^14.2.0",
+        "@angular/cdk": "~14.2.0",
+        "@angular/core": "^14.2.0",
+        "@rx-angular/cdk": "^1.0.0-rc.2",
+        "@rx-angular/state": "^1.7.0",
+        "@rx-angular/template": "^1.0.0-rc.3",
+        "rxjs": "~7.5.0",
+        "tslib": "^2.3.0",
+        "zone.js": "~0.11.4",
+        "dedent-js": "^1.0.1"
+    },
+    "devDependencies": {
+        "jest-preset-angular": "~12.2.2"
+    },
+    "dependencies": {
+        "tslib": "^2.3.0"
+    }
+}

@@ -1,0 +1,42 @@
+{
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "projectType": "library",
+    "sourceRoot": "libs/heroicon/src",
+    "prefix": "ng-heroicons",
+    "targets": {
+        "build": {
+            "executor": "@nrwl/angular:package",
+            "outputs": ["dist/libs/heroicon"],
+            "options": {
+                "project": "libs/heroicon/ng-package.json"
+            },
+            "configurations": {
+                "production": {
+                    "tsConfig": "libs/heroicon/tsconfig.lib.prod.json"
+                },
+                "development": {
+                    "tsConfig": "libs/heroicon/tsconfig.lib.json"
+                }
+            },
+            "defaultConfiguration": "production"
+        },
+        "test": {
+            "executor": "@nrwl/jest:jest",
+            "outputs": ["coverage/libs/heroicon"],
+            "options": {
+                "jestConfig": "libs/heroicon/jest.config.ts",
+                "passWithNoTests": true
+            }
+        },
+        "lint": {
+            "executor": "@nrwl/linter:eslint",
+            "options": {
+                "lintFilePatterns": [
+                    "libs/heroicon/**/*.ts",
+                    "libs/heroicon/**/*.html"
+                ]
+            }
+        }
+    },
+    "tags": ["scope:ng", "type:lib"]
+}
