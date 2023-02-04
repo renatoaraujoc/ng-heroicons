@@ -1,11 +1,9 @@
-const { createGlobPatternsForDependencies } = require('@nrwl/angular/tailwind');
-const { join } = require('path');
-
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+    mode: process.env.TAILWIND_MODE ? 'jit' : '',
     content: [
-        join(__dirname, 'src/**/!(*.stories|*.spec).{ts,html}'),
-        ...createGlobPatternsForDependencies(__dirname)
+        './apps/playground/**/*.{html,ts}',
+        './libs/heroicon/**/*.{html,ts}'
     ],
     theme: {
         extend: {}

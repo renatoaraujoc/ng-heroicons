@@ -1,14 +1,15 @@
 {
+    "name": "playground",
     "$schema": "../../node_modules/nx/schemas/project-schema.json",
     "projectType": "application",
     "sourceRoot": "apps/playground/src",
-    "prefix": "ng-heroicons",
+    "prefix": "playground",
     "targets": {
         "build": {
             "executor": "@angular-devkit/build-angular:browser",
             "outputs": ["{options.outputPath}"],
             "options": {
-                "outputPath": "dist/apps/playground",
+                "outputPath": "dist/apps/playground/browser",
                 "index": "apps/playground/src/index.html",
                 "main": "apps/playground/src/main.ts",
                 "polyfills": "apps/playground/src/polyfills.ts",
@@ -83,11 +84,68 @@
         },
         "test": {
             "executor": "@nrwl/jest:jest",
-            "outputs": ["coverage/apps/playground"],
+            "outputs": ["{workspaceRoot}/coverage/apps/playground"],
             "options": {
                 "jestConfig": "apps/playground/jest.config.ts",
                 "passWithNoTests": true
             }
+        },
+        "server": {
+            "dependsOn": ["build"],
+            "executor": "@angular-devkit/build-angular:server",
+            "options": {
+                "outputPath": "dist/apps/playground/server",
+                "main": "apps/playground/server.ts",
+                "tsConfig": "apps/playground/tsconfig.server.json"
+            },
+            "configurations": {
+                "production": {
+                    "outputHashing": "media",
+                    "fileReplacements": [
+                        {
+                            "replace": "apps/playground/src/environments/environment.ts",
+                            "with": "apps/playground/src/environments/environment.prod.ts"
+                        }
+                    ]
+                },
+                "development": {
+                    "optimization": false,
+                    "sourceMap": true,
+                    "extractLicenses": false
+                }
+            },
+            "defaultConfiguration": "production"
+        },
+        "serve-ssr": {
+            "executor": "@nguniversal/builders:ssr-dev-server",
+            "configurations": {
+                "development": {
+                    "browserTarget": "playground:build:development",
+                    "serverTarget": "playground:server:development"
+                },
+                "production": {
+                    "browserTarget": "playground:build:production",
+                    "serverTarget": "playground:server:production"
+                }
+            },
+            "defaultConfiguration": "development"
+        },
+        "prerender": {
+            "executor": "@nguniversal/builders:prerender",
+            "options": {
+                "routes": ["/"]
+            },
+            "configurations": {
+                "development": {
+                    "browserTarget": "playground:build:development",
+                    "serverTarget": "playground:server:development"
+                },
+                "production": {
+                    "browserTarget": "playground:build:production",
+                    "serverTarget": "playground:server:production"
+                }
+            },
+            "defaultConfiguration": "production"
         }
     },
     "tags": ["scope:playground", "type:app"]

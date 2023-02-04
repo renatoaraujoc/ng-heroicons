@@ -1,35 +1,17 @@
 import { Component } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import {
-    emojiHappy,
-    HeroIconComponent,
-    provideHeroIconGlobalConfig
-} from 'ng-heroicon';
 import { NgClass } from '@angular/common';
 
 @Component({
-    selector: 'app-playground',
-    standalone: true,
+    selector: 'app-root',
     templateUrl: './app.component.html',
-    styleUrls: ['./app.component.scss'],
-    imports: [HeroIconComponent],
-    providers: [
-        BrowserModule,
-        provideHeroIconGlobalConfig(
-            { emojiHappy },
-            {
-                defaultHostDisplay: 'block',
-                attachDefaultDimensionsIfNoneFound: false
-            }
-        )
-    ]
+    styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-    iconClass: NgClass['ngClass'] = 'text-red-500';
+    iconClass: NgClass['ngClass'] = 'text-red-500 w-4 h-4';
 
     constructor() {
         setTimeout(() => {
-            this.iconClass = 'text-red-500';
+            this.iconClass = 'text-red-500 w-4 h-4';
         }, 1500);
     }
 }

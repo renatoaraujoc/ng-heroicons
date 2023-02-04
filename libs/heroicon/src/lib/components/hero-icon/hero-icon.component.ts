@@ -3,9 +3,12 @@ import {
     Component,
     ElementRef,
     HostBinding,
-    inject,
+    Inject,
     Input,
+    Optional,
+    PLATFORM_ID,
     Renderer2,
+    SecurityContext,
     ViewChild
 } from '@angular/core';
 import { HeroIconName } from '../../icons/icons-names';
@@ -13,14 +16,16 @@ import { HI_ICON_SET_TOKEN, HI_OPTIONS_TOKEN } from '../../injection-tokens';
 import {
     HeroIconHostDisplay,
     HeroIconIconSet,
-    HeroIconIconType
+    HeroIconIconType,
+    HeroIconOptions
 } from '../../types';
 import { RxState, selectSlice } from '@rx-angular/state';
-import { DOCUMENT, NgClass } from '@angular/common';
+import { DOCUMENT, isPlatformServer, JsonPipe, NgClass } from '@angular/common';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import { LetModule } from '@rx-angular/template';
 import dedent from 'dedent-js';
 import { delay, ReplaySubject, switchMap, tap } from 'rxjs';
+import { DomSanitizer } from '@angular/platform-browser';
 
 interface State {
     hostDisplay: HeroIconHostDisplay;
@@ -47,6 +52,7 @@ interface State {
             ></span>
             <!-- the icon -->
             <svg
+                xmlns="http://www.w3.org/2000/svg"
                 [class.hi-d-outline]="
                     model.attachDefaultDimensionsIfNoneFound &&
                     model.shouldAttachDimensions &&
@@ -57,7 +63,6 @@ interface State {
                     model.shouldAttachDimensions &&
                     model.rendered.type === 'solid'
                 "
-                xmlns="http://www.w3.org/2000/svg"
                 [ngClass]="model.iconClass"
                 [attr.viewBox]="
                     model.rendered.type === 'solid' ? '0 0 20 20' : '0 0 24 24'
@@ -69,7 +74,7 @@ interface State {
         </ng-container>
     `,
     styleUrls: ['./hero-icon.component.scss'],
-    imports: [LetModule, NgClass],
+    imports: [LetModule, NgClass, JsonPipe],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HeroIconComponent extends RxState<State> {
@@ -174,32 +179,54 @@ export class HeroIconComponent extends RxState<State> {
     @ViewChild('svgRef') set svgRef(svgRef: ElementRef<SVGElement>) {
         if (svgRef) {
             this.#svgRef = svgRef;
+            // Watches the changes on the informed icon and renders it, respecting SSR
             this.hold(this.select('rendered'), ({ name, type }) => {
-                this._renderer.setProperty(
-                    svgRef.nativeElement,
-                    'innerHTML',
-                    name !== null ? this.get('availableIcons')[name][type] : ''
+                const iconHtml = this._domSanitizer.sanitize(
+                    SecurityContext.HTML,
+                    this._domSanitizer.bypassSecurityTrustHtml(
+                        name !== null
+                            ? this.get('availableIcons')[name][type]
+                            : ''
+                    )
                 );
+                // .innerHTML is not supported by SSR
+                if (isPlatformServer(this._platformId)) {
+                    const innerElement =
+                        this._renderer.createElement('ng-container');
+                    this._renderer.appendChild(
+                        this.#svgRef.nativeElement,
+                        innerElement
+                    );
+                    this._renderer.setProperty(
+                        innerElement,
+                        'outerHTML',
+                        iconHtml
+                    );
+                    this._renderer.removeChild(
+                        this.#svgRef.nativeElement,
+                        innerElement
+                    );
+                } else {
+                    this._renderer.setProperty(
+                        this.#svgRef.nativeElement,
+                        'innerHTML',
+                        iconHtml
+                    );
+                }
             });
         }
     }
 
-    private _document = inject(DOCUMENT);
-
-    private _iconSet = inject<ReadonlyArray<HeroIconIconSet>>(
-        HI_ICON_SET_TOKEN,
-        {
-            optional: true
-        }
-    );
-
-    private _options = inject(HI_OPTIONS_TOKEN, {
-        optional: true
-    });
-
     constructor(
-        private readonly _elementRef: ElementRef<HTMLElement>,
-        private readonly _renderer: Renderer2
+        @Optional()
+        @Inject(HI_ICON_SET_TOKEN)
+        private _iconSet: ReadonlyArray<HeroIconIconSet>,
+        @Optional() @Inject(HI_OPTIONS_TOKEN) private _options: HeroIconOptions,
+        @Inject(DOCUMENT) private _document: Document,
+        // eslint-disable-next-line @typescript-eslint/ban-types
+        @Inject(PLATFORM_ID) private _platformId: Object,
+        private _domSanitizer: DomSanitizer,
+        private _renderer: Renderer2
     ) {
         super();
 
@@ -251,12 +278,14 @@ export class HeroIconComponent extends RxState<State> {
     }
 
     private _calcShouldAttachDimensions() {
-        const window = this._document.defaultView;
-
-        if (!window) {
+        if (isPlatformServer(this._platformId)) {
             this.set({ shouldAttachDimensions: false });
             return;
         }
+
+        const window = this._document.defaultView as NonNullable<
+            typeof this._document.defaultView
+        >;
 
         const { height, width } = window.getComputedStyle(
             this.#testSpanRef.nativeElement
