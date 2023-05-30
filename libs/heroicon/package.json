@@ -16,12 +16,13 @@
         "url": "https://github.com/renatoaraujoc/heroicons.git"
     },
     "peerDependencies": {
-        "@angular/common": "^14.2.0",
-        "@angular/cdk": "~14.2.0",
-        "@angular/core": "^14.2.0",
-        "@rx-angular/cdk": "^1.0.0-rc.2",
+        "@angular/common": "15.1.2",
+        "@angular/cdk": "15.1.2",
+        "@angular/core": "15.1.2",
+        "@angular/platform-browser": "15.1.2",
+        "@rx-angular/cdk": "^1.0.0",
         "@rx-angular/state": "^1.7.0",
-        "@rx-angular/template": "^1.0.0-rc.3",
+        "@rx-angular/template": "^1.0.0",
         "rxjs": "~7.5.0",
         "tslib": "^2.3.0",
         "zone.js": "~0.11.4",

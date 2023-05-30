@@ -7,11 +7,11 @@ import { NgClass } from '@angular/common';
     styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-    iconClass: NgClass['ngClass'] = 'text-red-500 w-4 h-4';
+    iconClass: NgClass['ngClass'] = 'text-red-500 w-8 h-auto';
 
     constructor() {
         setTimeout(() => {
-            this.iconClass = 'text-red-500 w-4 h-4';
-        }, 1500);
+            this.iconClass = 'text-red-500 w-12 h-auto';
+        }, 4000);
     }
 }

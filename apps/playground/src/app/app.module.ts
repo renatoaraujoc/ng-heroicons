@@ -10,14 +10,6 @@ import { AppComponent } from './app.component';
     ],
     declarations: [AppComponent],
     bootstrap: [AppComponent],
-    providers: [
-        provideHeroIcons(
-            { emojiHappy },
-            {
-                defaultHostDisplay: 'block',
-                attachDefaultDimensionsIfNoneFound: false
-            }
-        )
-    ]
+    providers: [provideHeroIcons({ emojiHappy })]
 })
 export class AppModule {}

@@ -1,34 +1,11 @@
 :host {
-  &.hi-d-block {
-    display: block;
-    svg {
-      display: block;
-    }
-  }
+  display: block;
 
-  &.hi-d-inline-block {
+  .hi-d-inline-block {
     display: inline-block;
-    svg {
-      display: inline-block;
-    }
   }
+}
 
-  svg {
-    &.hi-d-outline {
-      width: 24px;
-      height: 24px;
-    }
-
-    &.hi-d-solid {
-      width: 20px;
-      height: 20px;
-    }
-  }
-
-  ::ng-deep {
-    path {
-      stroke: currentColor;
-    }
-  }
-
+::ng-deep hero-icon svg path {
+  stroke: currentColor;
 }

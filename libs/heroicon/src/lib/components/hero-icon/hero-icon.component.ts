@@ -3,6 +3,7 @@ import {
     Component,
     ElementRef,
     HostBinding,
+    inject,
     Inject,
     Input,
     Optional,
@@ -12,100 +13,61 @@ import {
     ViewChild
 } from '@angular/core';
 import { HeroIconName } from '../../icons/icons-names';
-import { HI_ICON_SET_TOKEN, HI_OPTIONS_TOKEN } from '../../injection-tokens';
-import {
-    HeroIconHostDisplay,
-    HeroIconIconSet,
-    HeroIconIconType,
-    HeroIconOptions
-} from '../../types';
+import { HI_ICON_SET_TOKEN } from '../../injection-tokens';
+import { HeroIconIconSet, HeroIconIconType } from '../../types';
 import { RxState, selectSlice } from '@rx-angular/state';
-import { DOCUMENT, isPlatformServer, JsonPipe, NgClass } from '@angular/common';
-import { coerceBooleanProperty } from '@angular/cdk/coercion';
-import { LetModule } from '@rx-angular/template';
+import { DOCUMENT, isPlatformServer, NgClass } from '@angular/common';
+import { LetModule } from '@rx-angular/template/let';
 import dedent from 'dedent-js';
-import { delay, ReplaySubject, switchMap, tap } from 'rxjs';
 import { DomSanitizer } from '@angular/platform-browser';
+import { RxStrategyNames } from '@rx-angular/cdk/render-strategies/lib/model';
 
 interface State {
-    hostDisplay: HeroIconHostDisplay;
-    attachDefaultDimensionsIfNoneFound: boolean;
     rendered: {
         name: string | null;
         type: HeroIconIconType;
     };
     availableIcons: HeroIconIconSet;
     iconClass: NgClass['ngClass'];
-    shouldAttachDimensions: boolean;
 }
 
 @Component({
     selector: 'hero-icon',
     standalone: true,
     template: `
-        <ng-container *rxLet="vm$; let model">
-            <!-- testSpan for autoDimensions -->
-            <span
-                [ngClass]="model.iconClass"
-                #testSpan
-                style="position: absolute;"
-            ></span>
-            <!-- the icon -->
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                [class.hi-d-outline]="
-                    model.attachDefaultDimensionsIfNoneFound &&
-                    model.shouldAttachDimensions &&
-                    model.rendered.type === 'outline'
-                "
-                [class.hi-d-solid]="
-                    model.attachDefaultDimensionsIfNoneFound &&
-                    model.shouldAttachDimensions &&
-                    model.rendered.type === 'solid'
-                "
-                [ngClass]="model.iconClass"
-                [attr.viewBox]="
-                    model.rendered.type === 'solid' ? '0 0 20 20' : '0 0 24 24'
-                "
-                stroke="currentColor"
-                fill="none"
-                #svgRef
-            ></svg>
-        </ng-container>
+        <svg
+            *rxLet="vm$; let model; strategy: renderStrategy"
+            xmlns="http://www.w3.org/2000/svg"
+            [ngClass]="model.iconClass"
+            [attr.width]="model.rendered.type === 'outline' ? '24px' : '20px'"
+            [attr.height]="model.rendered.type === 'outline' ? '24px' : '20px'"
+            [attr.viewBox]="
+                model.rendered.type === 'outline' ? '0 0 24 24' : '0 0 20 20'
+            "
+            stroke="currentColor"
+            fill="none"
+            #svgRef
+        ></svg>
     `,
     styleUrls: ['./hero-icon.component.scss'],
-    imports: [LetModule, NgClass, JsonPipe],
+    imports: [LetModule, NgClass],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HeroIconComponent extends RxState<State> {
     static __instanceId = 0;
 
+    renderStrategy: RxStrategyNames<any> = isPlatformServer(inject(PLATFORM_ID))
+        ? 'native'
+        : 'local';
+
     // eslint-disable-next-line no-underscore-dangle
     _instanceId = ++HeroIconComponent.__instanceId;
 
-    vm$ = this.select(
-        selectSlice([
-            'attachDefaultDimensionsIfNoneFound',
-            'shouldAttachDimensions',
-            'hostDisplay',
-            'iconClass',
-            'rendered'
-        ])
-    );
+    vm$ = this.select(selectSlice(['iconClass', 'rendered']));
 
     @HostBinding('id')
     get instanceId() {
         return `heroicon-${this._instanceId}`;
-    }
-
-    @HostBinding('class.hi-d-block')
-    get isDisplayBlock() {
-        return this.get('hostDisplay') === 'block';
-    }
-
-    @HostBinding('class.hi-d-inline-block')
-    get isDisplayInlineBlock() {
-        return this.get('hostDisplay') === 'inlineBlock';
     }
 
     @Input() set name(value: HeroIconName) {
@@ -118,7 +80,7 @@ export class HeroIconComponent extends RxState<State> {
         ) {
             this.__setIcon({ name: null });
             console.error(
-                dedent(`[${this.instanceId}] No icon named ${camelCasedIconName} was found. 
+                dedent(`[${this.instanceId}] No icon named '${camelCasedIconName}' was found. 
                 Please refer to documentation on how to import it.`)
             );
             return;
@@ -130,48 +92,8 @@ export class HeroIconComponent extends RxState<State> {
         this.__setIcon({ type });
     }
 
-    @Input() set hostDisplay(hostDisplay: HeroIconHostDisplay) {
-        this.set({ hostDisplay: hostDisplay ?? 'none' });
-    }
-
-    @Input() set attachDefaultDimensionsIfNoneFound(
-        attachDefaultDimensionsIfNoneFound: boolean
-    ) {
-        this.set({
-            attachDefaultDimensionsIfNoneFound: coerceBooleanProperty(
-                attachDefaultDimensionsIfNoneFound
-            )
-        });
-    }
-
-    @Input() set iconClass(
-        value:
-            | string
-            | string[]
-            | Set<string>
-            | {
-                  [klass: string]: any;
-              }
-            | null
-            | undefined
-    ) {
+    @Input() set iconClass(value: NgClass['ngClass']) {
         this.set({ iconClass: value });
-    }
-
-    #testSpanReady = new ReplaySubject();
-
-    #testSpanRef: ElementRef<HTMLSpanElement>;
-
-    /**
-     * Every span element has a default width and height of 'auto',
-     * so we fetch the height and width with the iconClass applyed into it, if any.
-     * We can then figure out if any dimensions are passed.
-     */
-    @ViewChild('testSpan') set testSpanRef(
-        testSpanRef: ElementRef<HTMLSpanElement>
-    ) {
-        this.#testSpanRef = testSpanRef;
-        this.#testSpanReady.next(null);
     }
 
     #svgRef: ElementRef<SVGElement>;
@@ -221,7 +143,6 @@ export class HeroIconComponent extends RxState<State> {
         @Optional()
         @Inject(HI_ICON_SET_TOKEN)
         private _iconSet: ReadonlyArray<HeroIconIconSet>,
-        @Optional() @Inject(HI_OPTIONS_TOKEN) private _options: HeroIconOptions,
         @Inject(DOCUMENT) private _document: Document,
         // eslint-disable-next-line @typescript-eslint/ban-types
         @Inject(PLATFORM_ID) private _platformId: Object,
@@ -252,48 +173,14 @@ export class HeroIconComponent extends RxState<State> {
                 ...icons,
                 ...iconset
             })),
-            attachDefaultDimensionsIfNoneFound:
-                this._options?.attachDefaultDimensionsIfNoneFound ?? false,
-            hostDisplay: this._options?.defaultHostDisplay ?? 'none',
-            iconClass: null,
-            shouldAttachDimensions: false
+            iconClass: null
         });
-
-        this.hold(
-            this.#testSpanReady.pipe(
-                switchMap(() => this.select('iconClass')),
-                // Need 1 ms after applying the class for getComputedStyle to work
-                delay(1),
-                tap(() => {
-                    this._calcShouldAttachDimensions();
-                })
-            )
-        );
     }
 
     private __setIcon(icon: Partial<State['rendered']>) {
         this.set((oldState) => ({
             rendered: { ...oldState.rendered, ...icon }
         }));
-    }
-
-    private _calcShouldAttachDimensions() {
-        if (isPlatformServer(this._platformId)) {
-            this.set({ shouldAttachDimensions: false });
-            return;
-        }
-
-        const window = this._document.defaultView as NonNullable<
-            typeof this._document.defaultView
-        >;
-
-        const { height, width } = window.getComputedStyle(
-            this.#testSpanRef.nativeElement
-        );
-
-        this.set({
-            shouldAttachDimensions: height === 'auto' && width === 'auto'
-        });
     }
 
     /**
