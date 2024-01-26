@@ -10,17 +10,17 @@
         "ng",
         "icons"
     ],
-    "homepage": "https://github.com/renatoaraujoc/heroicons/tree/master/angular/heroicons#readme",
+    "homepage": "https://github.com/renatoaraujoc/ng-heroicons",
     "repository": {
         "type": "git",
-        "url": "https://github.com/renatoaraujoc/heroicons.git"
+        "url": "https://github.com/renatoaraujoc/ng-heroicons"
     },
     "peerDependencies": {
         "@angular/common": "^16.0.0",
         "@angular/cdk": "^16.0.0",
         "@angular/core": "^16.0.0",
         "@angular/platform-browser": "^16.0.0",
-        "@rx-angular/cdk": "^16.0.0",
+        "@rx-angular/cdk": "^15.0.0",
         "@rx-angular/state": "^15.0.0",
         "@rx-angular/template": "^15.2.0",
         "rxjs": "~7.8.0",

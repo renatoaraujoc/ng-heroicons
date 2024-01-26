@@ -5,6 +5,7 @@
     "scripts": {
         "ng": "nx",
         "build-heroicon": "rimraf ./dist && nx run heroicon:build --skip-nx-cache",
+        "publish": "cd ./dist/libs/heroicon && npm pack && npm publish",
         "link-heroicon": "pnpm run build-heroicon && cd ./dist/libs/heroicon && yarn link",
         "postinstall": "node ./decorate-angular-cli.js",
         "start": "nx serve",
