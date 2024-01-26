@@ -5,23 +5,24 @@
         {
             "files": ["*.ts"],
             "parserOptions": {
-                "project": [
-                    "libs/heroicon/tsconfig(.*)?.json"
-                ]
+                "project": ["libs/heroicon/tsconfig(.*)?.json"]
             },
             "extends": [
-                "plugin:@nrwl/nx/angular",
+                "plugin:@nx/angular",
                 "plugin:@angular-eslint/template/process-inline-templates"
             ],
             "rules": {
-                "import/no-extraneous-dependencies": ["error", {
-                    "devDependencies": ["**/src/test-setup.ts"]
-                }]
+                "import/no-extraneous-dependencies": [
+                    "error",
+                    {
+                        "devDependencies": ["**/src/test-setup.ts"]
+                    }
+                ]
             }
         },
         {
             "files": ["*.html"],
-            "extends": ["plugin:@nrwl/nx/angular-template"],
+            "extends": ["plugin:@nx/angular-template"],
             "rules": {}
         }
     ]

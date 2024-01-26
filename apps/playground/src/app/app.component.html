@@ -1,5 +1,21 @@
-<hero-icon name="emoji-happy" type="solid" [iconClass]="iconClass"></hero-icon>
-<br />
-<br />
-<br />
-<hero-icon name="emoji-happy" type="solid"></hero-icon>
+<div class="flex flex-col gap-y-3">
+    <div>
+        <span class="font-medium"
+            >This will change class in 4 seconds and should reflect:</span
+        >
+        [ <span class="font-semibold">{{ iconClass | json }}</span> ]
+        <hero-icon
+            name="emoji-happy"
+            type="solid"
+            [iconClass]="iconClass"
+        ></hero-icon>
+    </div>
+    <div>
+        <span class="font-medium">Some outline icon:</span>
+        <hero-icon
+            name="adjustments"
+            type="outline"
+            iconClass="text-yellow-900 w-12 h-auto"
+        ></hero-icon>
+    </div>
+</div>

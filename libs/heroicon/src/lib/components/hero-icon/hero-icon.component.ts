@@ -15,12 +15,13 @@ import {
 import { HeroIconName } from '../../icons/icons-names';
 import { HI_ICON_SET_TOKEN } from '../../injection-tokens';
 import { HeroIconIconSet, HeroIconIconType } from '../../types';
-import { RxState, selectSlice } from '@rx-angular/state';
+import { RxState } from '@rx-angular/state';
 import { DOCUMENT, isPlatformServer, NgClass } from '@angular/common';
-import { LetModule } from '@rx-angular/template/let';
 import dedent from 'dedent-js';
 import { DomSanitizer } from '@angular/platform-browser';
 import { RxStrategyNames } from '@rx-angular/cdk/render-strategies/lib/model';
+import { LetDirective } from '@rx-angular/template/let';
+import { selectSlice } from '@rx-angular/state/selections';
 
 interface State {
     rendered: {
@@ -44,13 +45,18 @@ interface State {
             [attr.viewBox]="
                 model.rendered.type === 'outline' ? '0 0 24 24' : '0 0 20 20'
             "
-            stroke="currentColor"
-            fill="none"
+            [attr.stroke]="
+                model.rendered.type === 'outline' ? 'currentColor' : 'none'
+            "
+            [attr.stroke-width]="model.rendered.type === 'outline' ? '2' : '1'"
+            [attr.fill]="
+                model.rendered.type === 'solid' ? 'currentColor' : 'none'
+            "
             #svgRef
         ></svg>
     `,
     styleUrls: ['./hero-icon.component.scss'],
-    imports: [LetModule, NgClass],
+    imports: [NgClass, LetDirective],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HeroIconComponent extends RxState<State> {

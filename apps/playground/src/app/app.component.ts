@@ -11,7 +11,7 @@ export class AppComponent {
 
     constructor() {
         setTimeout(() => {
-            this.iconClass = 'text-red-500 w-12 h-auto';
+            this.iconClass = 'text-blue-500 w-12 h-auto';
         }, 4000);
     }
 }

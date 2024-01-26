@@ -74,7 +74,7 @@
             }
         },
         "lint": {
-            "executor": "@nrwl/linter:eslint",
+            "executor": "@nx/linter:eslint",
             "options": {
                 "lintFilePatterns": [
                     "apps/playground/**/*.ts",
@@ -83,7 +83,7 @@
             }
         },
         "test": {
-            "executor": "@nrwl/jest:jest",
+            "executor": "@nx/jest:jest",
             "outputs": ["{workspaceRoot}/coverage/apps/playground"],
             "options": {
                 "jestConfig": "apps/playground/jest.config.ts",
@@ -111,7 +111,8 @@
                 "development": {
                     "optimization": false,
                     "sourceMap": true,
-                    "extractLicenses": false
+                    "extractLicenses": false,
+                    "buildOptimizer": false
                 }
             },
             "defaultConfiguration": "production"
