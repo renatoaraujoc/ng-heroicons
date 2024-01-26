@@ -1,7 +1,7 @@
 {
     "name": "ng-heroicon",
     "author": "Renato Carneiro",
-    "version": "3.0.0",
+    "version": "3.0.1",
     "description": "Component to display icons from heroicons.com for Angular 16+, compatible with TailwindCSS",
     "keywords": [
         "tailwind",
